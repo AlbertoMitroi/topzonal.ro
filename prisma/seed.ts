@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { faker } from "@faker-js/faker";
 
 const prisma = new PrismaClient();
@@ -38,9 +38,7 @@ async function main() {
         data: {
           title: faker.lorem.sentence(5),
           description: faker.lorem.paragraphs(3),
-          price: new Prisma.Decimal(
-            faker.commerce.price({ min: 50, max: 500 }),
-          ),
+          price: faker.commerce.price({ min: 50, max: 500 }),
           latitude: parseFloat(
             faker.location
               .latitude({ min: 44.4, max: 44.5, precision: 6 })
