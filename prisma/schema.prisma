@@ -1,14 +1,66 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// The User model is our internal representation, linked to Clerk via clerkId.
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique // Foreign key to Clerk's user ID
+  email     String   @unique
+  firstName String?
+  lastName  String?
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  listings Listing[]
+  reviews  Review[]
+}
+
+model Listing {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @db.Text
+  price       Decimal  @db.Decimal(10, 2) // e.g., 12345678.99
+  latitude    Float
+  longitude   Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  authorId String
+  author   User     @relation(fields: [authorId], references: [clerkId], onDelete: Cascade)
+  reviews  Review[]
+  images   Image[]
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int // Rating from 1 to 5
+  comment   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  authorId  String
+  author    User    @relation(fields: [authorId], references: [clerkId], onDelete: Cascade)
+  listingId String
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([authorId, listingId]) // A user can only review a listing once
+}
+
+model Image {
+  id        String   @id @default(cuid())
+  url       String // URL from Cloudinary or another image CDN
+  createdAt DateTime @default(now())
+
+  // Relations
+  listingId String
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 }
