@@ -1,3 +1,6 @@
+Run in dev mode
+npm run dev
+
 Run the migration to apply schema to your database
 npx prisma migrate dev --name "[message]"
 
