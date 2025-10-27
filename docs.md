@@ -6,3 +6,9 @@ npx prisma migrate dev --name "[message]"
 
 Run the Seed Command
 npx prisma db seed
+
+# Docker
+
+docker compose up --build
+docker compose ps
+docker compose logs -f app
